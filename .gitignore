@@ -1,5 +1,5 @@
-db
 node_modules
+db/*
 
 # config
 .env
@@ -10,5 +10,5 @@ node_modules
 .env.development.local
 .env.test.local
 .env.production.local
-
 npm-debug.log*
+task.md
