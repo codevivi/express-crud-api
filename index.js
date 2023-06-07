@@ -1,12 +1,18 @@
-import express, { urlencoded } from "express";
+import express from "express";
 import { PORT } from "./src/config.js";
-console.log(PORT);
+import { inventoryRoutes } from "./src/routes/inventoryRoutes.js";
+import { addItem } from "./src/controllers/inventoryController.js";
+import { wrongEndPoint } from "./src/middlewares/wrongEndPoint.js";
+import { wrongRequestType } from "./src/middlewares/wrongRequestType.js";
 
-const api = express();
+const app = express();
 
-api.use(urlencoded({ extended: false }));
-api.use(express.json());
+app.use(express.json());
+app.use(wrongRequestType);
+app.post("/api/item", addItem);
+app.use("/api/inventory", inventoryRoutes);
+app.use(wrongEndPoint);
 
-api.listen(PORT, () => {
-  console.log(`express api is running on port ${PORT}`);
+app.listen(PORT, () => {
+  console.log(`express inventory api is running on port ${PORT}`);
 });
