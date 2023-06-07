@@ -6,15 +6,8 @@ Simple API for storing inventory
 
 ### 🚀 Goals
 
-PART 1
-
-- Every entry must be stored in separate json file.
-- Every entry must be an object with:
-  - id
-  - basic info
-  - Entry creation time
-- POST: /api/item - object with item
-- GET: /api/inventory - get all inventory (optional)
+- POST: /api/item - object with item; adds id, creation time to object and stores it in separate json file
+- GET: /api/inventory - get all inventory
 - GET: /api/inventory/[id] - get all item information by id
 
 #### 🏁 Getting started
