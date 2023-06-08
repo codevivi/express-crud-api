@@ -2,9 +2,9 @@
 import BaseModel from "./BaseModel.js";
 
 const fields = {
-  codeName: { type: "string", maxLen: 50 },
+  codeName: { type: "string", maxLen: 50, minLen: 2 },
   description: { type: "string", maxLen: 200 },
-  units: { type: "number", max: 1000000 },
+  units: { type: "number", max: 1000000, min: 0 },
 };
 
 class InventoryModel extends BaseModel {

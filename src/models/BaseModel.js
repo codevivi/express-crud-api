@@ -74,21 +74,29 @@ class BaseModel {
     if (entryFieldsLength > requiredFieldsLength) {
       throw { name: "dbError", message: `Too many entry fields, must provide: ${Object.keys(this.fields).join(", ")}.` };
     }
-    for (const key in entry) {
-      const existing = this.fields[key];
-      if (!existing) {
-        throw { name: "dbError", message: `Invalid entry field: ${key}` };
+    for (const entryKey in entry) {
+      const requiredKey = this.fields[entryKey];
+      const entryValue = entry[entryKey];
+      if (!requiredKey) {
+        throw { name: "dbError", message: `Invalid entry field: ${entryKey}` };
       }
-      if (existing.type !== typeof entry[key] || (existing.type === "number" && !isNaN(typeof entry[key]))) {
-        throw { name: "dbError", message: `Invalid entry field: ${key} type, must be ${existing.type}` };
+      if (requiredKey.type !== typeof entryValue || (requiredKey.type === "number" && !isNaN(typeof entryValue))) {
+        throw { name: "dbError", message: `Invalid entry field ${entryKey} value type, must be ${requiredKey.type}` };
       }
-      if (existing.maxLen && entry[key].length > existing.maxLen) {
-        throw { name: "dbError", message: `Invalid entry field: ${key} length, must be ${existing.maxLen}` };
+      if (requiredKey.maxLen && entryValue.length > requiredKey.maxLen) {
+        throw { name: "dbError", message: `Invalid entry field ${entryKey} value length, must be ${requiredKey.maxLen}` };
       }
-      if (existing.max && entry[key] > existing.max) {
-        throw { name: "dbError", message: `Invalid entry field: ${key}, must be  less than ${existing.max}` };
+      if (requiredKey.minLen && entryValue.length < requiredKey.minLen) {
+        throw { name: "dbError", message: `Invalid entry field: ${entryKey} value length, must be at least ${requiredKey.minLen}` };
+      }
+      if (requiredKey.max && entryValue > requiredKey.max) {
+        throw { name: "dbError", message: `Invalid entry field ${entryKey} value, must be less than ${requiredKey.max}` };
+      }
+      if (requiredKey.min && entryValue > requiredKey.min) {
+        throw { name: "dbError", message: `Invalid entry field ${entryKey} value, must be at least ${requiredKey.min}` };
       }
     }
+
     return true;
   }
 }
