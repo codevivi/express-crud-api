@@ -1,10 +1,11 @@
 import { mkdir, writeFile, readdir, readFile } from "node:fs/promises";
+import { mkdirSync, readdirSync } from "node:fs";
 import { DB_BASE_PATH } from "../config.js";
-import { v4 as uid } from "uuid";
 
-const makeSureIsFolder = async (path) => {
+//doing not async to make sure is blocking at the start or server restart
+function makeSureIsFolder(path) {
   try {
-    await mkdir(path);
+    mkdirSync(path);
     return true;
   } catch (e) {
     if (e.code == "EEXIST") {
@@ -12,19 +13,37 @@ const makeSureIsFolder = async (path) => {
     }
     throw new Error("could not create folder");
   }
-};
+}
+
+//doing not async to make sure is blocking at the start or server restart
+function* initIdsGenerator(folder) {
+  let files = readdirSync(folder);
+  let id = 1;
+  if (files.length > 0) {
+    id = Math.max(...files.map((name) => Number(name.replace(".json", "")))) + 1;
+  }
+  while (true) {
+    yield id++;
+  }
+}
 
 class BaseModel {
   //if fields left default false, means all entries allowed and not validated;
   constructor(folderName, fields = false) {
-    this.folder = `${DB_BASE_PATH}/${folderName}`;
+    const folder = `${DB_BASE_PATH}/${folderName}`;
+    this.folder = folder;
+    makeSureIsFolder(folder);
     this.fields = fields;
+    this._idGenerator = initIdsGenerator(folder);
+  }
+
+  get newId() {
+    return this._idGenerator.next().value;
   }
 
   async add(data) {
     this.validateInsertData(data);
-    await makeSureIsFolder(this.folder);
-    data.id = uid();
+    data.id = this.newId;
     data.creationTime = Date.now();
     const filePath = `${this.folder}/${data.id}.json`;
     let jsonData = JSON.stringify(data);
