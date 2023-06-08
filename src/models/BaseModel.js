@@ -22,7 +22,7 @@ class BaseModel {
   }
 
   async add(data) {
-    this.validateData(data);
+    this.validateInsertData(data);
     await makeSureIsFolder(this.folder);
     data.id = uid();
     data.creationTime = Date.now();
@@ -43,34 +43,32 @@ class BaseModel {
     return dataArr.map((item) => JSON.parse(item));
   }
 
-  validateData(entry) {
+  validateInsertData(entry) {
     if (!this.fields) {
       return true;
     }
-
-    console.log(entry);
-    let error = false;
+    const entryFieldsLength = Object.keys(entry).length;
+    const requiredFieldsLength = Object.keys(this.fields).length;
+    if (entryFieldsLength < requiredFieldsLength) {
+      throw { name: "dbError", message: `Missing entry fields, must provide: ${Object.keys(this.fields).join(", ")}.` };
+    }
+    if (entryFieldsLength > requiredFieldsLength) {
+      throw { name: "dbError", message: `Too many entry fields, must provide: ${Object.keys(this.fields).join(", ")}.` };
+    }
     for (const key in entry) {
       const existing = this.fields[key];
       if (!existing) {
-        error = true;
-        break;
+        throw { name: "dbError", message: `Invalid entry field: ${key}` };
       }
       if (existing.type !== typeof entry[key] || (existing.type === "number" && !isNaN(typeof entry[key]))) {
-        error = true;
-        break;
+        throw { name: "dbError", message: `Invalid entry field: ${key} type, must be ${existing.type}` };
       }
       if (existing.maxLen && entry[key].length > existing.maxLen) {
-        error = true;
-        break;
+        throw { name: "dbError", message: `Invalid entry field: ${key} length, must be ${existing.maxLen}` };
       }
       if (existing.max && entry[key] > existing.max) {
-        error = true;
-        break;
+        throw { name: "dbError", message: `Invalid entry field: ${key}, must be  less than ${existing.max}` };
       }
-    }
-    if (error) {
-      throw { name: "dbError", message: "invalid database fields" };
     }
     return true;
   }

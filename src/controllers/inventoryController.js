@@ -26,7 +26,6 @@ export const addItem = async (req, res, next) => {
     const id = await inventoryModel.add(req.body);
     res.status(201).json({ type: "success", message: "Added Item to Inventory", id: id });
   } catch (e) {
-    console.log(e);
     if (e.name === "dbError") {
       return res.status(400).json({ type: "failure", message: e.message });
     }
