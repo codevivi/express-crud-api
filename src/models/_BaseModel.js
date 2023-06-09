@@ -27,6 +27,7 @@ function* initIdsGenerator(folder) {
   }
 }
 
+//this is base class, do not create object directly from it, use extends
 class BaseModel {
   //if fields left default false, means all entries allowed and not validated;
   constructor(folderName, fields = false) {
@@ -35,6 +36,9 @@ class BaseModel {
     makeSureIsFolder(folder);
     this.fields = fields;
     this._idGenerator = initIdsGenerator(folder);
+    if (this.constructor.name === "BaseModel") {
+      throw new Error("BaseModel class can only be extended");
+    }
   }
 
   get newId() {
