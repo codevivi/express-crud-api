@@ -24,7 +24,8 @@ export const getById = async (req, res, next) => {
 
 export const addItem = async (req, res, next) => {
   try {
-    const id = await inventoryModel.add(req.body);
+    let { description, codeName } = req.body;
+    const id = await inventoryModel.add({ description, codeName });
     res.status(201).json({ type: "success", message: "Added Item to Inventory", id: id });
   } catch (e) {
     console.log(e);

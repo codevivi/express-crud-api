@@ -1,33 +1,9 @@
-import { mkdir, writeFile, readdir, readFile } from "node:fs/promises";
-import { mkdirSync, readdirSync } from "node:fs";
+import { writeFile, readdir, readFile } from "node:fs/promises";
 import { DB_BASE_PATH } from "../config.js";
+import { validateString, validateNumber } from "./helpers/validators.js";
+import makeSureIsFolder from "./helpers/makeSureIsFolder.js";
+import initIdsGenerator from "./helpers/initIdsGenerator.js";
 
-//doing not async to make sure is blocking at the start or server restart
-function makeSureIsFolder(path) {
-  try {
-    mkdirSync(path);
-    return true;
-  } catch (e) {
-    if (e.code == "EEXIST") {
-      return true;
-    }
-    throw new Error("could not create folder");
-  }
-}
-
-//doing not async to make sure is blocking at the start or server restart
-function* initIdsGenerator(folder) {
-  let files = readdirSync(folder);
-  let id = 1;
-  if (files.length > 0) {
-    id = Math.max(...files.map((name) => Number(name.replace(".json", "")))) + 1;
-  }
-  while (true) {
-    yield id++;
-  }
-}
-
-//this is base class, do not create object directly from it, use extends
 class BaseModel {
   //if fields left default false, means all entries allowed and not validated;
   constructor(folderName, fields = false) {
@@ -46,7 +22,7 @@ class BaseModel {
   }
 
   async add(data) {
-    this.validateInsertData(data);
+    data = this.validateInsertData(data);
     data.id = this.newId;
     data.creationTime = Date.now();
     const filePath = `${this.folder}/${data.id}.json`;
@@ -68,7 +44,7 @@ class BaseModel {
 
   validateInsertData(entry) {
     if (!this.fields) {
-      return true;
+      return entry;
     }
     const entryFieldsLength = Object.keys(entry).length;
     const requiredFieldsLength = Object.keys(this.fields).length;
@@ -83,29 +59,22 @@ class BaseModel {
       if (!requiredKey) {
         throw { name: "dbError", message: `Invalid entry field: ${entryKey}` };
       }
-      if (requiredKey.type === "number" && typeof entry[entryKey] !== "number") {
-        entry[entryKey] = Number(entry[entryKey]);
+      if (requiredKey.type === "number") {
+        const { errMsg, number } = validateNumber(entry[entryKey], requiredKey.min ?? null, requiredKey.max ?? null);
+        if (errMsg) {
+          throw { name: "dbError", message: `Invalid entry field ${entryKey}  ${errMsg}` };
+        }
+        entry[entryKey] = number;
       }
-      const entryValue = entry[entryKey];
-      if (requiredKey.type !== typeof entryValue || (requiredKey.type === "number" && isNaN(entryValue))) {
-        throw { name: "dbError", message: `Invalid entry field ${entryKey} value type, must be ${requiredKey.type} or convertible` };
-      }
-      if (requiredKey.maxLen && entryValue.length > requiredKey.maxLen) {
-        throw { name: "dbError", message: `Invalid entry field ${entryKey} value length, must be ${requiredKey.maxLen}` };
-      }
-      if (requiredKey.minLen && entryValue.length < requiredKey.minLen) {
-        throw { name: "dbError", message: `Invalid entry field: ${entryKey} value length, must be at least ${requiredKey.minLen}` };
-      }
-      if (requiredKey.max && entryValue > requiredKey.max) {
-        throw { name: "dbError", message: `Invalid entry field ${entryKey} value, must be less than ${requiredKey.max}` };
-      }
-      if (requiredKey.min && entryValue < requiredKey.min) {
-        console.log(requiredKey.min, entryValue);
-        throw { name: "dbError", message: `Invalid entry field ${entryKey} value, must be at least ${requiredKey.min}` };
+      if (requiredKey.type === "string") {
+        const { errMsg, string } = validateString(entry[entryKey], requiredKey.minLen ?? null, requiredKey.maxLen ?? null);
+        if (errMsg) {
+          throw { name: "dbError", message: `Invalid entry field ${entryKey}  ${errMsg}` };
+        }
+        entry[entryKey] = string;
       }
     }
-
-    return true;
+    return entry;
   }
 }
 export default BaseModel;
