@@ -6,7 +6,7 @@ Simple API for storing inventory
 
 ### 🚀 Goals
 
-- POST: /api/item - object with item; adds id, creation time to object and stores it in separate json file
+- POST: /api/item - object with item {codeName: 'string 2-50chars', description: 'string 0-500 chars'}; adds id, creation time to object and stores it in separate json file
 - GET: /api/inventory - get all inventory
 - GET: /api/inventory/[id] - get all item information by id
 
