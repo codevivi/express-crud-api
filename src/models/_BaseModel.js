@@ -4,7 +4,7 @@ import { validateString, validateNumber } from "./helpers/validators.js";
 import makeSureIsFolder from "./helpers/makeSureIsFolder.js";
 import initIdsGenerator from "./helpers/initIdsGenerator.js";
 
-class BaseModel {
+class _BaseModel {
   //if fields left default false, means all entries allowed and not validated;
   constructor(folderName, fields = false) {
     const folder = `${DB_BASE_PATH}/${folderName}`;
@@ -77,4 +77,4 @@ class BaseModel {
     return entry;
   }
 }
-export default BaseModel;
+export default _BaseModel;

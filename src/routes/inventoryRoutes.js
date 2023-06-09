@@ -5,4 +5,5 @@ import { getAll, getById } from "../controllers/inventoryController.js";
 router.get("", getAll);
 router.get("/:id", getById);
 
-export const inventoryRoutes = router;
+const inventoryRoutes = router;
+export default inventoryRoutes;

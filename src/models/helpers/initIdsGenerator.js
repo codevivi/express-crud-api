@@ -1,4 +1,5 @@
 import { readdirSync } from "node:fs";
+
 //doing not async to make sure is blocking at the start or server restart
 function* initIdsGenerator(folder) {
   let files = readdirSync(folder);

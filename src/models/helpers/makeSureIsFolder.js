@@ -1,4 +1,5 @@
 import { mkdirSync } from "node:fs";
+
 //doing not async to make sure is blocking at the start or server restart
 function makeSureIsFolder(path) {
   try {
@@ -11,4 +12,5 @@ function makeSureIsFolder(path) {
     throw new Error("could not create folder");
   }
 }
+
 export default makeSureIsFolder;
