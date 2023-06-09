@@ -5,12 +5,12 @@ export const validateString = (value, minLen = null, maxLen = null) => {
   value = value.trim().trimStart();
   if (minLen !== null) {
     if (value.length < minLen) {
-      return { errMsg: `value length, must be at least ${minLen} length` };
+      return { errMsg: `value length must be at least ${minLen} characters length` };
     }
   }
   if (maxLen !== null) {
     if (value.length > maxLen) {
-      return { errMsg: `value length, must be no more than ${maxLen} length` };
+      return { errMsg: `value length must be no more than ${maxLen} characters length` };
     }
   }
   return { string: value };

@@ -3,6 +3,7 @@ import { DB_BASE_PATH } from "../config.js";
 import { validateString, validateNumber } from "./helpers/validators.js";
 import makeSureIsFolder from "./helpers/makeSureIsFolder.js";
 import initIdsGenerator from "./helpers/initIdsGenerator.js";
+import CustomError from "../utils/CustomError.js";
 
 class _BaseModel {
   //if fields left default false, means all entries allowed and not validated;
@@ -32,8 +33,14 @@ class _BaseModel {
   }
 
   async getById(id) {
-    const item = await readFile(`${this.folder}/${id}.json`, "utf-8");
-    return JSON.parse(item);
+    try {
+      const item = await readFile(`${this.folder}/${id}.json`, "utf-8");
+      return JSON.parse(item);
+    } catch (e) {
+      if (e.code === "ENOENT") {
+        throw new CustomError(404, "failure", "Inventory item with this id not found");
+      }
+    }
   }
 
   async getAll() {
@@ -49,27 +56,24 @@ class _BaseModel {
     const entryFieldsLength = Object.keys(entry).length;
     const requiredFieldsLength = Object.keys(this.fields).length;
     if (entryFieldsLength < requiredFieldsLength) {
-      throw { name: "dbError", message: `Missing entry fields, must provide: ${Object.keys(this.fields).join(", ")}.` };
+      throw new CustomError(400, "failure", `Missing entry fields, must provide: ${Object.keys(this.fields).join(", ")}.`);
     }
     if (entryFieldsLength > requiredFieldsLength) {
-      throw { name: "dbError", message: `Too many entry fields, must provide: ${Object.keys(this.fields).join(", ")}.` };
+      throw new CustomError(400, "failure", `Too many entry fields, must provide: ${Object.keys(this.fields).join(", ")}.`);
     }
     for (const entryKey in entry) {
-      const requiredKey = this.fields[entryKey];
-      if (!requiredKey) {
-        throw { name: "dbError", message: `Invalid entry field: ${entryKey}` };
-      }
+      let requiredKey = this.fields[entryKey];
       if (requiredKey.type === "number") {
         const { errMsg, number } = validateNumber(entry[entryKey], requiredKey.min ?? null, requiredKey.max ?? null);
         if (errMsg) {
-          throw { name: "dbError", message: `Invalid entry field ${entryKey}  ${errMsg}` };
+          throw new CustomError(400, "failure", `Entry must have a field ${entryKey}, ${errMsg}`);
         }
         entry[entryKey] = number;
       }
       if (requiredKey.type === "string") {
         const { errMsg, string } = validateString(entry[entryKey], requiredKey.minLen ?? null, requiredKey.maxLen ?? null);
         if (errMsg) {
-          throw { name: "dbError", message: `Invalid entry field ${entryKey}  ${errMsg}` };
+          throw new CustomError(400, "failure", `Entry must have a field ${entryKey}, ${errMsg}`);
         }
         entry[entryKey] = string;
       }
