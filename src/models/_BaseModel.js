@@ -80,12 +80,15 @@ class BaseModel {
     }
     for (const entryKey in entry) {
       const requiredKey = this.fields[entryKey];
-      const entryValue = entry[entryKey];
       if (!requiredKey) {
         throw { name: "dbError", message: `Invalid entry field: ${entryKey}` };
       }
-      if (requiredKey.type !== typeof entryValue || (requiredKey.type === "number" && !isNaN(typeof entryValue))) {
-        throw { name: "dbError", message: `Invalid entry field ${entryKey} value type, must be ${requiredKey.type}` };
+      if (requiredKey.type === "number" && typeof entry[entryKey] !== "number") {
+        entry[entryKey] = Number(entry[entryKey]);
+      }
+      const entryValue = entry[entryKey];
+      if (requiredKey.type !== typeof entryValue || (requiredKey.type === "number" && isNaN(entryValue))) {
+        throw { name: "dbError", message: `Invalid entry field ${entryKey} value type, must be ${requiredKey.type} or convertible` };
       }
       if (requiredKey.maxLen && entryValue.length > requiredKey.maxLen) {
         throw { name: "dbError", message: `Invalid entry field ${entryKey} value length, must be ${requiredKey.maxLen}` };
@@ -96,7 +99,8 @@ class BaseModel {
       if (requiredKey.max && entryValue > requiredKey.max) {
         throw { name: "dbError", message: `Invalid entry field ${entryKey} value, must be less than ${requiredKey.max}` };
       }
-      if (requiredKey.min && entryValue > requiredKey.min) {
+      if (requiredKey.min && entryValue < requiredKey.min) {
+        console.log(requiredKey.min, entryValue);
         throw { name: "dbError", message: `Invalid entry field ${entryKey} value, must be at least ${requiredKey.min}` };
       }
     }
