@@ -8,6 +8,7 @@ import { wrongRequestType } from "./src/middlewares/wrongRequestType.js";
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(wrongRequestType);
 app.post("/api/item", addItem);
 app.use("/api/inventory", inventoryRoutes);

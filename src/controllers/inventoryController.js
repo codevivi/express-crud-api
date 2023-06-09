@@ -5,6 +5,7 @@ export const getAll = async (req, res, next) => {
     const items = await inventoryModel.getAll();
     res.status(200).json({ type: "success", message: "Got all inventory items", items: items });
   } catch (e) {
+    console.log(e);
     res.status(500).json({ type: "error", message: "Server Error" });
   }
 };
