@@ -4,7 +4,7 @@ import errorOnWrongRequestType from "./src/middlewares/errorOnWrongRequestType.j
 import errorOnWrongEndPoint from "./src/middlewares/errorOnWrongEndPoint.js";
 import errorResponder from "./src/middlewares/errorResponder.js";
 import awaitErrorCatcher from "./src/utils/awaitErrorCatcher.js";
-import { getInventoryPage, addItemToInventory, getInventory } from "./src/controllers/inventoryController.js";
+import { getInventoryPage, addItemToInventory, getInventory } from "./src/controllers/inventoryController/inventoryController.js";
 
 const app = express();
 
