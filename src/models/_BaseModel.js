@@ -43,6 +43,11 @@ class _BaseModel {
     }
   }
 
+  async getCount() {
+    const files = await readdir(this.folder);
+    return files.length;
+  }
+
   async getAll() {
     const files = await readdir(this.folder);
     const dataArr = await Promise.all(files.map((file) => readFile(`${this.folder}/${file}`, "utf-8")));
