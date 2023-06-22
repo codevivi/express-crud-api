@@ -1,7 +1,7 @@
 import inventoryModel from "../../models/inventoryModel.js";
 import { validatePageReqParams } from "./validators.js";
-import { REQ_BASE_URL } from "../../config.js";
-import { defaultItemsPerPage } from "../../utils/configsByInput.js";
+import { REQ_BASE_URL } from "../../config/config.js";
+import { defaultItemsPerPage } from "../../config/perPageConfig.js";
 
 export const getInventory = async (req, res, next) => {
   if (req?.params.id) {

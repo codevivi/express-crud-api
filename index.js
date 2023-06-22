@@ -1,5 +1,5 @@
 import express from "express";
-import { PORT } from "./src/config.js";
+import { PORT } from "./src/config/config.js";
 import errorOnWrongRequestType from "./src/middlewares/errorOnWrongRequestType.js";
 import errorOnWrongEndPoint from "./src/middlewares/errorOnWrongEndPoint.js";
 import errorResponder from "./src/middlewares/errorResponder.js";
