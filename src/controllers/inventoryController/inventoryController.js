@@ -22,7 +22,7 @@ export const getInventoryPage = async (req, res, next) => {
   const itemsSortedByCodeName = await inventoryModel.getPage(page, size);
   let items = itemsSortedByCodeName.sort((a, b) => {
     if (a.codeName === b.codeName) {
-      return a.creationTime - b.creationTime;
+      return b.creationTime - a.creationTime;
     } else {
       return 0;
     }
