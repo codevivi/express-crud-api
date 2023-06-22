@@ -1,13 +1,8 @@
-// let codeNameChars = [" ", "-", "z", "y", "x", "w", "v", "u", "t", "s", "r", "q", "p", "o", "n", "m", "l", "k", "j", "i", "h", "g", "f", "e", "d", "c", "b", "a", "9", "8", "7", "6", "5", "4", "3", "2", "1", "0"];
-// codeNameChars = codeNameChars.sort((a, b) => a.localeCompare(b));
-// let codeNameCharsMap = new Map();
-// codeNameChars.forEach((c, i) => codeNameCharsMap.set(i, c));
-
 class TrieNode {
   constructor(char) {
     this.char = char;
-    this.parent = null; //reference to previous node
-    this.children = {}; //reference to further nodes (word chars);
+    this.parent = null;
+    this.children = {};
     this.end = []; // if the end of the world, store word ids, as there might be more than one same word with different ids (will get words by ids from db);
   }
 
@@ -31,7 +26,6 @@ class Trie {
 
   insert(word, id) {
     let current = this.root;
-    // for every character in the word
     for (let i = 0; i < word.length; i++) {
       // check to see if character exists in  current node children.
       if (!current.children[word[i]]) {
@@ -41,7 +35,7 @@ class Trie {
         current.children[word[i]].parent = current;
       }
 
-      // change current node to be new crated or existing char node
+      // change current node to be new created or existing char node
       current = current.children[word[i]];
 
       // check if it's the last char.
@@ -54,11 +48,10 @@ class Trie {
 
   containsFullWord(word) {
     let current = this.root;
-    // for every character in the word
     for (let i = 0; i < word.length; i++) {
       // check to see if character  exists in current node children.
       if (current.children[word[i]]) {
-        // if it exists, go deeper by changing current to found existing
+        // if it exists, go deeper by changing current to found or existing
         current = current.children[word[i]];
       } else {
         // doesn't exist, return false since it's not a valid word.
@@ -91,14 +84,13 @@ class Trie {
     return output;
   }
 
-  // recursive function to find all words in the given current.
   findAllWordsSorted(current = this.root, arr = []) {
     // base case, if current is at the end of word, push to output all ids
     if (current.end.length > 0) {
       arr.push(...current.end);
     }
 
-    // iterate through each children, call recursive findAllWords
+    // iterate through each children, calling itself
     for (let ind in this.sortedCharacters) {
       let char = this.sortedCharacters[ind];
       if (current?.children[char]) {
@@ -135,6 +127,7 @@ class Trie {
 
       return false;
     };
+
     removeWord(current, id);
   }
 

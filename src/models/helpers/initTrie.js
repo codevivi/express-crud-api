@@ -10,12 +10,10 @@ function initTrie(folder, fieldToIndexedTrie, allowedChars) {
     let dataItem = JSON.parse(item);
     return { id: dataItem.id, field: dataItem[fieldToIndexedTrie] };
   });
-  // console.log(fieldsToTrie);
   let trie = new Trie(allowedChars);
   fieldsToTrie.forEach((item) => {
     trie.insert(item.field, item.id);
   });
-  // console.log(trie.findAllWordsSorted());
   return trie;
 }
 
