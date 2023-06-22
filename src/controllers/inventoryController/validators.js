@@ -1,5 +1,5 @@
 import CustomError from "../../utils/CustomError.js";
-import { defaultItemsPerPage, minItemsPerPage, maxItemsPerPage } from "../../utils/configsByInput.js";
+import { defaultItemsPerPage, minItemsPerPage, maxItemsPerPage } from "../../config/perPageConfig.js";
 
 export const validatePageReqParams = (req, totalItemsCount) => {
   let page = req?.params.page;
@@ -20,7 +20,6 @@ export const validatePageReqParams = (req, totalItemsCount) => {
       throw new CustomError(400, "failure", "Bad request parameters, please provide size (items per page) as integer");
     }
     if (size < minItemsPerPage || size > maxItemsPerPage) {
-      console.log(size, "gkjskjkj");
       throw new CustomError(400, "failure", `Bad request, please provide size (items per page) as integer between ${minItemsPerPage}-${maxItemsPerPage}`);
     }
   }

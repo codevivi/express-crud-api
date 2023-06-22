@@ -1,18 +1,20 @@
 import { writeFile, readdir, readFile } from "node:fs/promises";
-import { DB_BASE_PATH } from "../config.js";
+import { DB_BASE_PATH } from "../config/config.js";
 import { validateString, validateNumber } from "./helpers/validators.js";
 import makeSureIsFolder from "./helpers/makeSureIsFolder.js";
 import initIdsGenerator from "./helpers/initIdsGenerator.js";
 import CustomError from "../utils/CustomError.js";
+import initTrie from "./helpers/initTrie.js";
 
 class _BaseModel {
   //if fields left default false, means all entries allowed and not validated;
-  constructor(folderName, fields = false) {
+  constructor(folderName, fields = false, fieldToIndexedTrie = false) {
     const folder = `${DB_BASE_PATH}/${folderName}`;
     this.folder = folder;
     makeSureIsFolder(folder);
     this.fields = fields;
     this._idGenerator = initIdsGenerator(folder);
+    this.trie = fieldToIndexedTrie ? initTrie(folder, fieldToIndexedTrie, fields[fieldToIndexedTrie].allowedChars.chars) : null;
     if (this.constructor.name === "BaseModel") {
       throw new Error("BaseModel class can only be extended");
     }
@@ -31,7 +33,6 @@ class _BaseModel {
     await writeFile(filePath, jsonData);
     return data.id;
   }
-
   async getById(id) {
     try {
       const item = await readFile(`${this.folder}/${id}.json`, "utf-8");
@@ -53,6 +54,8 @@ class _BaseModel {
     const dataArr = await Promise.all(files.map((file) => readFile(`${this.folder}/${file}`, "utf-8")));
     return dataArr.map((item) => JSON.parse(item));
   }
+
+  async getPage() {}
 
   validateInsertData(entry) {
     if (!this.fields) {
