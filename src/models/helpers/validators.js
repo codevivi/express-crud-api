@@ -1,4 +1,4 @@
-export const validateString = (value, minLen = null, maxLen = null) => {
+export const validateString = (value, minLen = null, maxLen = null, allowedChars = null) => {
   if (typeof value !== "string") {
     return { errMsg: `value must be a string` };
   }
@@ -13,6 +13,14 @@ export const validateString = (value, minLen = null, maxLen = null) => {
       return { errMsg: `value length must be no more than ${maxLen} characters length` };
     }
   }
+  if (allowedChars !== null) {
+    for (let i = 0; i < value.length; i++) {
+      if (!allowedChars.chars.includes(value[i])) {
+        return { errMsg: `value contains invalid characters, valid characters: ${allowedChars.description}` };
+      }
+    }
+  }
+
   return { string: value };
 };
 

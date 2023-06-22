@@ -7,7 +7,7 @@ const fields = {
     type: "string",
     maxLen: 50,
     minLen: 2,
-    allowedChars: { description: 'only english lowercase letters, digits, "-", and space', chars: [" ", "-", "z", "y", "x", "w", "v", "u", "t", "s", "r", "q", "p", "o", "n", "m", "l", "k", "j", "i", "h", "g", "f", "e", "d", "c", "b", "a", "9", "8", "7", "6", "5", "4", "3", "2", "1", "0"] },
+    allowedChars: { description: "only english lowercase letters, digits, -, and space", chars: [" ", "-", "z", "y", "x", "w", "v", "u", "t", "s", "r", "q", "p", "o", "n", "m", "l", "k", "j", "i", "h", "g", "f", "e", "d", "c", "b", "a", "9", "8", "7", "6", "5", "4", "3", "2", "1", "0"] },
   },
   description: { type: "string", maxLen: 500 },
 };

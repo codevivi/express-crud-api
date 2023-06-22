@@ -89,7 +89,7 @@ class _BaseModel {
         entry[entryKey] = number;
       }
       if (requiredKey.type === "string") {
-        const { errMsg, string } = validateString(entry[entryKey], requiredKey.minLen ?? null, requiredKey.maxLen ?? null);
+        const { errMsg, string } = validateString(entry[entryKey], requiredKey.minLen ?? null, requiredKey.maxLen ?? null, requiredKey.allowedChars ?? null);
         if (errMsg) {
           throw new CustomError(400, "failure", `Entry must have a field ${entryKey}, ${errMsg}`);
         }
