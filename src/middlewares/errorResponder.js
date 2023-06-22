@@ -1,5 +1,6 @@
 import CustomError from "../utils/CustomError.js";
 const errorResponder = (error, req, res, next) => {
+  console.log(error);
   if (error instanceof CustomError) {
     return res.status(error.code).json({
       type: error.type,

@@ -19,7 +19,14 @@ export const getInventoryPage = async (req, res, next) => {
   const nextPage = totalItemsCount - page * size > 0 ? page + 1 : "";
   const prevUrl = prevPage ? `${REQ_BASE_URL}/inventory-page/${prevPage}${size !== defaultItemsPerPage ? "/" + size : ""}` : "";
   const nextUrl = nextPage ? `${REQ_BASE_URL}/inventory-page/${nextPage}${size !== defaultItemsPerPage ? "/" + size : ""}` : "";
-  const items = [];
+  const itemsSortedByCodeName = await inventoryModel.getPage(page, size);
+  let items = itemsSortedByCodeName.sort((a, b) => {
+    if (a.codeName === b.codeName) {
+      return a.creationTime - b.creationTime;
+    } else {
+      return 0;
+    }
+  });
 
   res.status(200).json({ type: "success", message: `Got inventory page(${page}), items per page(${size})`, prev: prevUrl, items: items, next: nextUrl });
 };

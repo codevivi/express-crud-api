@@ -14,6 +14,7 @@ class _BaseModel {
     makeSureIsFolder(folder);
     this.fields = fields;
     this._idGenerator = initIdsGenerator(folder);
+    this.fieldToIndexedTrie = fieldToIndexedTrie;
     this.trie = fieldToIndexedTrie ? initTrie(folder, fieldToIndexedTrie, fields[fieldToIndexedTrie].allowedChars.chars) : null;
     if (this.constructor.name === "BaseModel") {
       throw new Error("BaseModel class can only be extended");
@@ -31,8 +32,12 @@ class _BaseModel {
     const filePath = `${this.folder}/${data.id}.json`;
     let jsonData = JSON.stringify(data);
     await writeFile(filePath, jsonData);
+    if (this.trie) {
+      this.trie.insert(data[this.fieldToIndexedTrie], data.id);
+    }
     return data.id;
   }
+
   async getById(id) {
     try {
       const item = await readFile(`${this.folder}/${id}.json`, "utf-8");
@@ -55,7 +60,12 @@ class _BaseModel {
     return dataArr.map((item) => JSON.parse(item));
   }
 
-  async getPage() {}
+  async getPage(page, size) {
+    const allSortedIdsByMainField = this.trie.findAllWordsSorted();
+    const idsPageChunk = allSortedIdsByMainField.slice((page - 1) * size, page * size);
+    const dataArr = await Promise.all(idsPageChunk.map((id) => readFile(`${this.folder}/${id}.json`, "utf-8")));
+    return dataArr.map((item) => JSON.parse(item));
+  }
 
   validateInsertData(entry) {
     if (!this.fields) {
